@@ -48,14 +48,14 @@ def get_whisper_model(whisper_model: str) -> WhisperModel:
     """Get a whisper model from the cache or download it if it doesn't exist"""
     model_folder = Path(MODEL_DATA_DIR, whisper_model)
     if not model_folder.is_dir():
+        model_folder.mkdir(parents=True)
+
         # config.json, model.bin, tokenizer.json, vocabulary.json
         download_path = Path(MODEL_DATA_DIR, f"{whisper_model}.tar")
         download_file(
             "https://www.dropbox.com/scl/fi/tc4d2xuf23ra99mvwp4ms/WhisperCHsmall.tar?dl=1&rlkey=ifx4evisyh09d7yistwlo4kz5",
             download_path,
         )
-
-        model_folder.mkdir(parents=True)
 
         with tarfile.open(download_path, "r") as tar_file:
             tar_file.extractall(model_folder)
@@ -131,12 +131,13 @@ async def transcriptions(
             }
         )
 
-    if response_format in ["text"]:
-        text = " ".join([seg["text"] for seg in segment_dicts])
-        return text
+    if response_format in ["text", "json"]:
+        text = " ".join([seg["text"].strip() for seg in segment_dicts])
 
     if response_format in ["verbose_json"]:
         return segment_dicts
-
-    text = " ".join([seg["text"] for seg in segment_dicts])
+    
+    if response_format in ["text"]:
+        return text
+    
     return {"text": text}

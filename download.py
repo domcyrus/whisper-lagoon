@@ -1,3 +1,4 @@
+import os
 import tarfile
 from pathlib import Path
 
@@ -36,3 +37,6 @@ def download_model(model_data_dir: str, whisper_model_name: str):
 
     with tarfile.open(download_path, "r") as tar_file:
         tar_file.extractall(model_folder)
+
+    # delete downloaded file after extraction
+    os.remove(download_path)

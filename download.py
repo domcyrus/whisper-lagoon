@@ -7,8 +7,16 @@ import requests
 download_paths = {
     "small": {
         "int8": "https://www.dropbox.com/scl/fi/tc4d2xuf23ra99mvwp4ms/WhisperCHsmall.tar?dl=1&rlkey=ifx4evisyh09d7yistwlo4kz5",
-        "float16": "https://www.dropbox.com/scl/fi/tc4d2xuf23ra99mvwp4ms/WhisperCHsmall.tar?dl=1&rlkey=ifx4evisyh09d7yistwlo4kz5",
-    }
+        "float16": "",
+    },
+    "medium": {
+        "int8": "",
+        "float16": "",
+    },
+    "large-v2": {
+        "int8": "https://www.dropbox.com/scl/fi/luzlaglvzpdwxbnb1q1f4/large-v2_int8.tar?dl=1&rlkey=dstv4lrpw3r99byzc5c04iupf",
+        "float16": "https://www.dropbox.com/scl/fi/dzkinrmd046pwoqyz3qx7/large-v2_float16.tar?dl=1&rlkey=wn40ftqsvt7mzzfeqa5bpbkrq",
+    },
 }
 
 
@@ -33,11 +41,11 @@ def _download_file(url: str, destination: Path):
 def _download_model(
     model_data_dir: str, whisper_model_name: str, quantization: str
 ) -> None:
-    model_folder = Path(model_data_dir, whisper_model_name)
+    model_folder = Path(model_data_dir, f"{whisper_model_name}_{quantization}")
 
     model_folder.mkdir(parents=True, exist_ok=True)
 
-    download_path = Path(model_data_dir, f"{whisper_model_name}.tar")
+    download_path = Path(model_data_dir, f"{whisper_model_name}_{quantization}.tar")
     _download_file(
         download_paths[whisper_model_name][quantization],
         download_path,
@@ -53,7 +61,7 @@ def _download_model(
 def download_model_if_not_cached(
     model_data_dir: str, whisper_model_name: str, quantization: str
 ) -> Path:
-    model_folder = Path(model_data_dir, whisper_model_name)
+    model_folder = Path(model_data_dir, f"{whisper_model_name}_{quantization}")
 
     # config.json, model.bin, tokenizer.json, vocabulary.json
     if Path(model_folder, "model.bin").exists():

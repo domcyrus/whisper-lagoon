@@ -19,7 +19,7 @@ COPY ./requirements.txt /requirements.txt
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r /requirements.txt
 
-ENV MODEL=small
+ENV MODEL=large-v2
 ENV QUANTIZATION=float16
 
 # Copy the current directory contents into the container at /app

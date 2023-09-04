@@ -1,5 +1,6 @@
 import os
 import shutil
+import time
 from functools import lru_cache
 from pathlib import Path
 from typing import Iterable, Optional
@@ -72,6 +73,9 @@ async def transcriptions(
     file: UploadFile = File(...),
     response_format: Optional[str] = Form(None),
 ):
+    if response_format in ["verbose_json"]:
+        st = time.time()
+
     assert model == "whisper-ch"
     if file is None:
         raise HTTPException(
@@ -111,7 +115,10 @@ async def transcriptions(
         text = " ".join([seg["text"].strip() for seg in segment_dicts])
 
     if response_format in ["verbose_json"]:
-        return segment_dicts
+        et = time.time()
+        elapsed_time = et - st
+        result_dict = {"segments": segment_dicts, "elapsed_seconds": elapsed_time}
+        return result_dict
 
     if response_format in ["text"]:
         return text

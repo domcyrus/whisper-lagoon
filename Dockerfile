@@ -1,7 +1,5 @@
 FROM python:3.10.10
 
-ENV MODEL=WhisperCHsmall
-
 # Run updates and install ffmpeg
 RUN apt-get update && \
     apt-get upgrade -y && \
@@ -15,6 +13,8 @@ COPY ./requirements.txt /requirements.txt
 # Pip install the dependencies
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r /requirements.txt
+
+ENV MODEL=small
 
 # Copy the current directory contents into the container at /app
 COPY main.py /app/main.py

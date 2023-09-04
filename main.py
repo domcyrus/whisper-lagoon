@@ -8,7 +8,7 @@ from fastapi import FastAPI, File, Form, HTTPException, UploadFile, status
 from faster_whisper import WhisperModel
 from faster_whisper.transcribe import Segment
 
-from download import download_model
+from download import download_model_if_not_cached
 
 app = FastAPI()
 
@@ -28,10 +28,10 @@ MODEL_DATA_DIR = "/data/cache"
 @lru_cache(maxsize=1)
 def get_whisper_model(whisper_model: str) -> WhisperModel:
     """Get a whisper model from the cache or download it if it doesn't exist"""
-    model_folder = Path(MODEL_DATA_DIR, whisper_model)
 
-    if not model_folder.is_dir():
-        download_model(model_data_dir=MODEL_DATA_DIR, whisper_model_name=whisper_model)
+    model_folder = download_model_if_not_cached(
+        model_data_dir=MODEL_DATA_DIR, whisper_model_name=whisper_model
+    )
 
     model = WhisperModel(str(model_folder))
     return model

@@ -24,3 +24,8 @@ curl http://127.0.0.1:8000/v1/audio/transcriptions \
   -F file="@/path/to/file/openai.mp3" \
   -F response_format="verbose_json"
 ```
+
+Windows example:
+```sh
+curl http://127.0.0.1:8000/v1/audio/transcriptions -H "Authorization: Bearer $OPENAI_API_KEY" -H "Content-Type: multipart/form-data" -F model="whisper-ch" -F file="@F:\FHNW\first.mp3" -F response_format="verbose_json"
+```

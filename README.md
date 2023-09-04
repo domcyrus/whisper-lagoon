@@ -13,6 +13,17 @@ docker compose build
 docker compose up -d
 ```
 
+## Local GPU
+Use docker compose to build and start the API.  
+
+```sh
+docker compose -f docker-compose.gpu.yml build
+```
+
+```sh
+docker compose -f docker-compose.gpu.yml up -d
+```
+
 ## Curl Test API (identical to OpenAI Whisper API example)
 Note: Authorization header is currently ignored.
 

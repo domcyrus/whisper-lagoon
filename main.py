@@ -26,25 +26,27 @@ MODEL_DATA_DIR = "/data/cache"
 
 
 @lru_cache(maxsize=1)
-def get_whisper_model(whisper_model: str) -> WhisperModel:
+def get_whisper_model(whisper_model: str, quantization: str) -> WhisperModel:
     """Get a whisper model from the cache or download it if it doesn't exist"""
 
     model_folder = download_model_if_not_cached(
-        model_data_dir=MODEL_DATA_DIR, whisper_model_name=whisper_model
+        model_data_dir=MODEL_DATA_DIR,
+        whisper_model_name=whisper_model,
+        quantization=quantization,
     )
 
-    model = WhisperModel(str(model_folder))
+    model = WhisperModel(str(model_folder), compute_type=quantization)
     return model
 
 
 def transcribe(
-    audio_path: str, whisper_model: str, **whisper_args
+    audio_path: str, whisper_model: str, quantization: str, **whisper_args
 ) -> Iterable[Segment]:
     """Transcribe the audio file using whisper"""
 
     # Get whisper model
     # NOTE: If mulitple models are selected, this may keep all of them in memory depending on the cache size
-    transcriber = get_whisper_model(whisper_model)
+    transcriber = get_whisper_model(whisper_model, quantization)
 
     segments, _ = transcriber.transcribe(
         audio=audio_path,
@@ -56,6 +58,7 @@ def transcribe(
 
 WHISPER_DEFAULT_SETTINGS = {
     "whisper_model": os.getenv("MODEL"),
+    "quantization": os.getenv("QUANTIZATION"),
     "task": "transcribe",
     "language": "de",
     "beam_size": 5,

@@ -5,7 +5,10 @@ from pathlib import Path
 import requests
 
 download_paths = {
-    "small": "https://www.dropbox.com/scl/fi/tc4d2xuf23ra99mvwp4ms/WhisperCHsmall.tar?dl=1&rlkey=ifx4evisyh09d7yistwlo4kz5"
+    "small": {
+        "int8": "https://www.dropbox.com/scl/fi/tc4d2xuf23ra99mvwp4ms/WhisperCHsmall.tar?dl=1&rlkey=ifx4evisyh09d7yistwlo4kz5",
+        "float16": "https://www.dropbox.com/scl/fi/tc4d2xuf23ra99mvwp4ms/WhisperCHsmall.tar?dl=1&rlkey=ifx4evisyh09d7yistwlo4kz5",
+    }
 }
 
 
@@ -27,14 +30,16 @@ def _download_file(url: str, destination: Path):
         print(f"Download failed with status code {response.status_code}")
 
 
-def _download_model(model_data_dir: str, whisper_model_name: str) -> None:
+def _download_model(
+    model_data_dir: str, whisper_model_name: str, quantization: str
+) -> None:
     model_folder = Path(model_data_dir, whisper_model_name)
 
     model_folder.mkdir(parents=True, exist_ok=True)
 
     download_path = Path(model_data_dir, f"{whisper_model_name}.tar")
     _download_file(
-        download_paths[whisper_model_name],
+        download_paths[whisper_model_name][quantization],
         download_path,
     )
 
@@ -45,13 +50,15 @@ def _download_model(model_data_dir: str, whisper_model_name: str) -> None:
     os.remove(download_path)
 
 
-def download_model_if_not_cached(model_data_dir: str, whisper_model_name: str) -> Path:
+def download_model_if_not_cached(
+    model_data_dir: str, whisper_model_name: str, quantization: str
+) -> Path:
     model_folder = Path(model_data_dir, whisper_model_name)
 
     # config.json, model.bin, tokenizer.json, vocabulary.json
     if Path(model_folder, "model.bin").exists():
         return model_folder
 
-    _download_model(model_data_dir, whisper_model_name)
+    _download_model(model_data_dir, whisper_model_name, quantization)
 
     return model_folder

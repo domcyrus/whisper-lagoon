@@ -1,10 +1,15 @@
-FROM python:3.10.10
+FROM nvidia/cuda:11.7.1-cudnn8-devel-ubuntu22.04
 
-# Run updates and install ffmpeg
+RUN apt-get update && apt-get upgrade -y
+
+# Run updates and install dependencies
 RUN apt-get update && \
     apt-get upgrade -y && \
+    apt-get install -y build-essential && \
     apt-get install -y ffmpeg && \
+    apt-get install -y sox libsox-dev python3-dev python3-pip python3-distutils && \
     apt-get clean && \
+    apt-get autoremove -y && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy and install the requirements
@@ -15,7 +20,7 @@ RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r /requirements.txt
 
 ENV MODEL=small
-ENV QUANTIZATION=int8
+ENV QUANTIZATION=float16
 
 # Copy the current directory contents into the container at /app
 COPY main.py /app/main.py

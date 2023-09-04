@@ -1,14 +1,14 @@
 import os
 import shutil
-import tarfile
 from functools import lru_cache
 from pathlib import Path
 from typing import Iterable, Optional
 
-import requests
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile, status
 from faster_whisper import WhisperModel
 from faster_whisper.transcribe import Segment
+
+from download import download_model
 
 app = FastAPI()
 
@@ -25,41 +25,14 @@ app = FastAPI()
 MODEL_DATA_DIR = "/data/cache"
 
 
-def download_file(url: str, destination: Path):
-    print(f"Downloading {url} to {destination}...")
-    response = requests.get(url, stream=True)
-    if response.status_code == 200:
-        with open(destination, "wb") as f:
-            total_downloaded = 0
-            for chunk in response.iter_content(chunk_size=1024):
-                if chunk:  # filter out keep-alive new chunks
-                    f.write(chunk)
-                    total_downloaded += len(chunk)
-                    if total_downloaded >= 10485760:  # 10 MB
-                        print(".", end="", flush=True)
-                        total_downloaded = 0
-        print("\nDownload complete.")
-    else:
-        print(f"Download failed with status code {response.status_code}")
-
-
 @lru_cache(maxsize=1)
 def get_whisper_model(whisper_model: str) -> WhisperModel:
     """Get a whisper model from the cache or download it if it doesn't exist"""
-    model_folder = Path(MODEL_DATA_DIR, whisper_model)
+
     if not model_folder.is_dir():
-        model_folder.mkdir(parents=True)
+        download_model(model_data_dir=MODEL_DATA_DIR, whisper_model_name=whisper_model)
 
-        # config.json, model.bin, tokenizer.json, vocabulary.json
-        download_path = Path(MODEL_DATA_DIR, f"{whisper_model}.tar")
-        download_file(
-            "https://www.dropbox.com/scl/fi/tc4d2xuf23ra99mvwp4ms/WhisperCHsmall.tar?dl=1&rlkey=ifx4evisyh09d7yistwlo4kz5",
-            download_path,
-        )
-
-        with tarfile.open(download_path, "r") as tar_file:
-            tar_file.extractall(model_folder)
-
+    model_folder = Path(MODEL_DATA_DIR, whisper_model)
     model = WhisperModel(str(model_folder))
     return model
 
@@ -136,8 +109,8 @@ async def transcriptions(
 
     if response_format in ["verbose_json"]:
         return segment_dicts
-    
+
     if response_format in ["text"]:
         return text
-    
+
     return {"text": text}

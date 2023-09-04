@@ -28,11 +28,11 @@ MODEL_DATA_DIR = "/data/cache"
 @lru_cache(maxsize=1)
 def get_whisper_model(whisper_model: str) -> WhisperModel:
     """Get a whisper model from the cache or download it if it doesn't exist"""
+    model_folder = Path(MODEL_DATA_DIR, whisper_model)
 
     if not model_folder.is_dir():
         download_model(model_data_dir=MODEL_DATA_DIR, whisper_model_name=whisper_model)
 
-    model_folder = Path(MODEL_DATA_DIR, whisper_model)
     model = WhisperModel(str(model_folder))
     return model
 

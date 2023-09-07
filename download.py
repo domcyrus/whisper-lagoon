@@ -6,16 +6,16 @@ import requests
 
 download_paths = {
     "small": {
-        "int8": "https://www.dropbox.com/scl/fi/tc4d2xuf23ra99mvwp4ms/WhisperCHsmall.tar?dl=1&rlkey=ifx4evisyh09d7yistwlo4kz5",
-        "float16": "",
+        "int8": os.getenv("SMALL_INT8"),
+        "float16": os.getenv("SMALL_FLOAT16"),
     },
     "medium": {
-        "int8": "",
-        "float16": "",
+        "int8": os.getenv("MEDIUM_INT8"),
+        "float16": os.getenv("MEDIUM_FLOAT16"),
     },
     "large-v2": {
-        "int8": "https://www.dropbox.com/scl/fi/luzlaglvzpdwxbnb1q1f4/large-v2_int8.tar?dl=1&rlkey=dstv4lrpw3r99byzc5c04iupf",
-        "float16": "https://www.dropbox.com/scl/fi/dzkinrmd046pwoqyz3qx7/large-v2_float16.tar?dl=1&rlkey=wn40ftqsvt7mzzfeqa5bpbkrq",
+        "int8": os.getenv("LARGE_INT8"),
+        "float16": os.getenv("LARGE_FLOAT16"),
     },
 }
 

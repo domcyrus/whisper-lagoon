@@ -1,6 +1,1 @@
 docker-compose-yaml: docker-compose.yml
-environments:
-  main:
-    routes:
-      - whisper-api:
-        - whisper-api.marco-test6.amazeeio.review
